@@ -15,7 +15,7 @@ do
     elif [ $(echo "$file" | grep 'added') ]; then
         FILE_ACTION="added"
     else 
-        EXTENSION=$(echo "$file" | grep ".php$")
+        EXTENSION=$(echo "$file" | grep -E ".php$|.module$|.inc$|.install$")
         if [ "$EXTENSION" != "" ]; then
             echo "Checking $FILE_ACTION file: $file" 
             ERRORS=$(php -l $ROOT_DIR$file 2>&1 | grep "Parse error")
