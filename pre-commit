@@ -3,30 +3,20 @@
 # Author: Vytautas Povilaitis <php-checker@vytux.lt>
 
 ROOT_DIR="$(pwd)/"
-LIST=$(git status | grep -e '\#.*\(modified\|added\)')
+LIST=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD)
 ERRORS_BUFFER=""
 for file in $LIST
 do
-    if [ "$file" == '#' ]; then
-        continue
-    fi
-    if [ $(echo "$file" | grep 'modified') ]; then
-        FILE_ACTION="modified"
-    elif [ $(echo "$file" | grep 'added') ]; then
-        FILE_ACTION="added"
-    else 
-        EXTENSION=$(echo "$file" | grep ".php$")
-        if [ "$EXTENSION" != "" ]; then
-            echo "Checking $FILE_ACTION file: $file" 
-            ERRORS=$(php -l $ROOT_DIR$file 2>&1 | grep "Parse error")
-            if [ "$ERRORS" != "" ]; then
-                if [ "$ERRORS_BUFFER" != "" ]; then
-                    ERRORS_BUFFER="$ERRORS_BUFFER\n$ERRORS"
-                else
-                    ERRORS_BUFFER="$ERRORS"
-                fi
-                echo "Syntax errors found in file: $file "
+    EXTENSION=$(echo "$file" | grep ".php$")
+    if [ "$EXTENSION" != "" ]; then
+        ERRORS=$(php -l $ROOT_DIR$file 2>&1 | grep "Parse error")
+        if [ "$ERRORS" != "" ]; then
+            if [ "$ERRORS_BUFFER" != "" ]; then
+                ERRORS_BUFFER="$ERRORS_BUFFER\n$ERRORS"
+            else
+                ERRORS_BUFFER="$ERRORS"
             fi
+            echo "Syntax errors found in file: $file "
         fi
     fi
 done
