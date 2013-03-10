@@ -7,7 +7,7 @@ LIST=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD)
 ERRORS_BUFFER=""
 for file in $LIST
 do
-    EXTENSION=$(echo "$file" | grep ".php$")
+    EXTENSION=$(echo "$file" | grep  -E ".php$|.module$|.inc$|.install$")
     if [ "$EXTENSION" != "" ]; then
         ERRORS=$(php -l $ROOT_DIR$file 2>&1 | grep "Parse error")
         if [ "$ERRORS" != "" ]; then
